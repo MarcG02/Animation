@@ -55,7 +55,7 @@ public class AnimationController implements ApplicationListener {
 
 		TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 		spriteBatch.begin();
-		spriteBatch.draw(currentFrame, 50, 50);
+		spriteBatch.draw(currentFrame, 50, 50, 250, 300);
 		spriteBatch.end();
 	}
 
