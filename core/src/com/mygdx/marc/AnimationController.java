@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class AnimationController implements ApplicationListener {
 
-	private static final int FRAME_COLS = 6, FRAME_ROWS = 5;
+	private static final int FRAME_COLS = 6, FRAME_ROWS = 1;
 
 	Animation<TextureRegion> walkAnimation;
 	Texture walkSheet;
@@ -23,7 +23,7 @@ public class AnimationController implements ApplicationListener {
 	@Override
 	public void create() {
 
-		walkSheet = new Texture(Gdx.files.internal("sprite-animation.png"));
+		walkSheet = new Texture(Gdx.files.internal("mario-Animation.png"));
 
 		TextureRegion[][] tmp = TextureRegion.split(walkSheet,
 				walkSheet.getWidth() / FRAME_COLS,
@@ -55,7 +55,7 @@ public class AnimationController implements ApplicationListener {
 
 		TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 		spriteBatch.begin();
-		spriteBatch.draw(currentFrame, 50, 50, 250, 300);
+		spriteBatch.draw(currentFrame, 50, 50, 300, 300);
 		spriteBatch.end();
 	}
 
