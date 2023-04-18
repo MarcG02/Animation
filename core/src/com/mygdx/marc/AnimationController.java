@@ -12,36 +12,35 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class AnimationController implements ApplicationListener {
 
-	private static final int FRAME_COLS = 6, FRAME_ROWS = 1;
-
-	Animation<TextureRegion> walkAnimation;
 	Texture walkSheet;
 	SpriteBatch spriteBatch;
-
+	TextureRegion frames[] = new TextureRegion[12];
+	//TextureRegion walkFrame[] = new TextureRegion[7];
+	Animation<TextureRegion> mario, walkMario;
 	float stateTime;
+	SpriteBatch batch;
 
 	@Override
 	public void create() {
-
 		walkSheet = new Texture(Gdx.files.internal("mario-Animation.png"));
 
-		TextureRegion[][] tmp = TextureRegion.split(walkSheet,
-				walkSheet.getWidth() / FRAME_COLS,
-				walkSheet.getHeight() / FRAME_ROWS);
+		frames[0] = new TextureRegion(walkSheet,0,0,25,29);
+		frames[1] = new TextureRegion(walkSheet,33,0,25,29);
+		frames[2] = new TextureRegion(walkSheet,65,0,25,29);
+		frames[3] = new TextureRegion(walkSheet,97,0,25,29);
+		frames[4] = new TextureRegion(walkSheet,128,0,25,29);
+		frames[5] = new TextureRegion(walkSheet,160,0,25,29);
 
+		frames[6] = new TextureRegion(walkSheet,0,29,25,29);
+		frames[7] = new TextureRegion(walkSheet,31,29,25,29);
+		frames[8] = new TextureRegion(walkSheet,64,29,25,29);
+		frames[9] = new TextureRegion(walkSheet,95,29,25,29);
+		frames[10] = new TextureRegion(walkSheet,127,29,25,29);
+		frames[11] = new TextureRegion(walkSheet,159,29,25,29);
 
-		TextureRegion[] walkFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-		int index = 0;
-		for (int i = 0; i < FRAME_ROWS; i++) {
-			for (int j = 0; j < FRAME_COLS; j++) {
-				walkFrames[index++] = tmp[i][j];
-			}
-		}
-
-		walkAnimation = new Animation<TextureRegion>(0.029f, walkFrames);
-
-		spriteBatch = new SpriteBatch();
-		stateTime = 0f;
+		mario = new Animation<TextureRegion>(0.29f,frames);
+		//walkMario = new Animation<TextureRegion>(0.29f,walkFrame);
+		batch = new SpriteBatch();
 	}
 
 	@Override
@@ -50,13 +49,19 @@ public class AnimationController implements ApplicationListener {
 
 	@Override
 	public void render() {
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stateTime += Gdx.graphics.getDeltaTime();
 
-		TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-		spriteBatch.begin();
-		spriteBatch.draw(currentFrame, 50, 50, 300, 300);
-		spriteBatch.end();
+		TextureRegion frame = mario.getKeyFrame(stateTime,true);
+
+		batch.begin();
+		batch.draw(frame, 200, 100, 0, 0,
+				frame.getRegionWidth(),frame.getRegionHeight(),10,10,0);
+
+		/*TextureRegion walkFrame = walkMario.getKeyFrame(stateTime,true);
+
+		batch.draw(walkFrame, 200, 100, 0, 0,
+				walkFrame.getRegionWidth(),walkFrame.getRegionHeight(),3,3,0);*/
+		batch.end();
 	}
 
 	@Override
