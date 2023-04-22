@@ -1,42 +1,59 @@
 package com.mygdx.marc;
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class AnimationController implements ApplicationListener {
+public class AnimationController extends ApplicationAdapter {
 
-	Texture walkSheet;
+	Texture walkSheet,backGround;
 	SpriteBatch spriteBatch;
-	TextureRegion frames[] = new TextureRegion[12];
-	//TextureRegion walkFrame[] = new TextureRegion[7];
-	Animation<TextureRegion> mario, walkMario;
+	TextureRegion frames[] = new TextureRegion[6];
+	TextureRegion walkFrame[] = new TextureRegion[6];
+	TextureRegion leftWalkFrame[] = new TextureRegion[6];
+	Animation<TextureRegion> mario, walkMario, leftWalkMario;
 	float stateTime;
 	SpriteBatch batch;
+	float posx, posy;
 
 	@Override
 	public void create() {
+		backGround = new Texture(Gdx.files.internal("backGround.png"));
+		backGround.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
 		walkSheet = new Texture(Gdx.files.internal("mario-Animation.png"));
 
-		frames[0] = new TextureRegion(walkSheet,0,0,25,29);
-		frames[1] = new TextureRegion(walkSheet,33,0,25,29);
-		frames[2] = new TextureRegion(walkSheet,65,0,25,29);
-		frames[3] = new TextureRegion(walkSheet,97,0,25,29);
-		frames[4] = new TextureRegion(walkSheet,128,0,25,29);
-		frames[5] = new TextureRegion(walkSheet,160,0,25,29);
+		posx = 750;
+		posy = 450;
 
-		frames[6] = new TextureRegion(walkSheet,0,29,25,29);
-		frames[7] = new TextureRegion(walkSheet,31,29,25,29);
-		frames[8] = new TextureRegion(walkSheet,64,29,25,29);
-		frames[9] = new TextureRegion(walkSheet,95,29,25,29);
-		frames[10] = new TextureRegion(walkSheet,127,29,25,29);
-		frames[11] = new TextureRegion(walkSheet,159,29,25,29);
+		frames[0] = new TextureRegion(walkSheet,0,0,25,29);
+		frames[1] = new TextureRegion(walkSheet,31,0,25,29);
+		frames[2] = new TextureRegion(walkSheet,64,0,25,29);
+		frames[3] = new TextureRegion(walkSheet,95,0,25,29);
+		frames[4] = new TextureRegion(walkSheet,127,0,25,29);
+		frames[5] = new TextureRegion(walkSheet,159,0,25,29);
+
+		walkFrame[0] = new TextureRegion(walkSheet,0,29,25,29);
+		walkFrame[1] = new TextureRegion(walkSheet,31,29,25,29);
+		walkFrame[2] = new TextureRegion(walkSheet,64,29,25,29);
+		walkFrame[3] = new TextureRegion(walkSheet,95,29,25,29);
+		walkFrame[4] = new TextureRegion(walkSheet,127,29,25,29);
+		walkFrame[5] = new TextureRegion(walkSheet,159,29,25,29);
+
+		leftWalkFrame[0] = new TextureRegion(walkSheet,0,59,25,29);
+		leftWalkFrame[1] = new TextureRegion(walkSheet,31,59,25,29);
+		leftWalkFrame[2] = new TextureRegion(walkSheet,64,59,25,29);
+		leftWalkFrame[3] = new TextureRegion(walkSheet,95,59,25,29);
+		leftWalkFrame[4] = new TextureRegion(walkSheet,127,59,25,29);
+		leftWalkFrame[5] = new TextureRegion(walkSheet,159,59,25,29);
 
 		mario = new Animation<TextureRegion>(0.23f,frames);
-		//walkMario = new Animation<TextureRegion>(0.29f,walkFrame);
+		walkMario = new Animation<TextureRegion>(0.23f,walkFrame);
+		leftWalkMario = new Animation<TextureRegion>(0.23f,leftWalkFrame);
 		batch = new SpriteBatch();
 		stateTime = 0f;
 	}
@@ -51,16 +68,35 @@ public class AnimationController implements ApplicationListener {
 		stateTime += Gdx.graphics.getDeltaTime();
 
 		TextureRegion frame = mario.getKeyFrame(stateTime,true);
+		TextureRegion walkCurrentFrame = walkMario.getKeyFrame(stateTime,true);
+		TextureRegion leftWalkCurrentFrame = leftWalkMario.getKeyFrame(stateTime,true);
+
 
 		batch.begin();
-		batch.draw(frame, 200, 100, 0, 0,
-				frame.getRegionWidth(),frame.getRegionHeight(),10,10,0);
-
-		/*TextureRegion walkFrame = walkMario.getKeyFrame(stateTime,true);
-
-		batch.draw(walkFrame, 200, 100, 0, 0,
-				walkFrame.getRegionWidth(),walkFrame.getRegionHeight(),3,3,0);*/
+		batch.draw(backGround, 0 , 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
+
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+			mario = new Animation<TextureRegion>(0.023f, walkFrame);
+			batch.begin();
+			posx += 25;
+			batch.draw(walkCurrentFrame, posx, posy,0, 0,
+					walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),10,10,0);
+			batch.end();
+		}else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+			mario = new Animation<TextureRegion>(0.023f, leftWalkFrame);
+			batch.begin();
+			posx -= 25;
+			batch.draw(leftWalkCurrentFrame, posx, posy,0, 0,
+					leftWalkCurrentFrame.getRegionWidth(),leftWalkCurrentFrame.getRegionHeight(),10,10,0);
+			batch.end();
+		}else{
+			batch.begin();
+			mario = new Animation<TextureRegion>(0.23f,frames);
+			batch.draw(frame, posx, posy, 0, 0,
+					frame.getRegionWidth(),frame.getRegionHeight(),10,10,0);
+			batch.end();
+		}
 	}
 
 	@Override
@@ -77,5 +113,6 @@ public class AnimationController implements ApplicationListener {
 	public void dispose() {
 		spriteBatch.dispose();
 		walkSheet.dispose();
+		backGround.dispose();
 	}
 }
