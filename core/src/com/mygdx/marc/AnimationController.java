@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 
 public class AnimationController extends ApplicationAdapter {
 
@@ -20,13 +21,11 @@ public class AnimationController extends ApplicationAdapter {
 	float stateTime;
 	SpriteBatch batch;
 	float posx, posy;
-
 	@Override
 	public void create() {
 		backGround = new Texture(Gdx.files.internal("backGround.png"));
 		backGround.setWrap(Texture.TextureWrap.MirroredRepeat, Texture.TextureWrap.MirroredRepeat);
 		walkSheet = new Texture(Gdx.files.internal("mario-Animation.png"));
-
 		posx = 750;
 		posy = 450;
 
@@ -51,9 +50,9 @@ public class AnimationController extends ApplicationAdapter {
 		leftWalkFrame[4] = new TextureRegion(walkSheet,127,59,25,29);
 		leftWalkFrame[5] = new TextureRegion(walkSheet,159,59,25,29);
 
-		mario = new Animation<TextureRegion>(0.23f,frames);
-		walkMario = new Animation<TextureRegion>(0.23f,walkFrame);
-		leftWalkMario = new Animation<TextureRegion>(0.23f,leftWalkFrame);
+		mario = new Animation<TextureRegion>(0.25f,frames);
+		walkMario = new Animation<TextureRegion>(0.25f,walkFrame);
+		leftWalkMario = new Animation<TextureRegion>(0.25f,leftWalkFrame);
 		batch = new SpriteBatch();
 		stateTime = 0f;
 	}
@@ -71,32 +70,49 @@ public class AnimationController extends ApplicationAdapter {
 		TextureRegion walkCurrentFrame = walkMario.getKeyFrame(stateTime,true);
 		TextureRegion leftWalkCurrentFrame = leftWalkMario.getKeyFrame(stateTime,true);
 
-
 		batch.begin();
 		batch.draw(backGround, 0 , 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.end();
-
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-			mario = new Animation<TextureRegion>(0.023f, walkFrame);
+		//Animating every direction
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			mario = new Animation<TextureRegion>(0.25f, walkFrame);
 			batch.begin();
 			posx += 25;
-			batch.draw(walkCurrentFrame, posx, posy,0, 0,
-					walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),10,10,0);
+			batch.draw(walkCurrentFrame, posx, posy, 0, 0,
+					walkCurrentFrame.getRegionWidth(), walkCurrentFrame.getRegionHeight(), 10, 10, 0);
 			batch.end();
+
 		}else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-			mario = new Animation<TextureRegion>(0.023f, leftWalkFrame);
+			mario = new Animation<TextureRegion>(0.25f, leftWalkFrame);
 			batch.begin();
 			posx -= 25;
 			batch.draw(leftWalkCurrentFrame, posx, posy,0, 0,
 					leftWalkCurrentFrame.getRegionWidth(),leftWalkCurrentFrame.getRegionHeight(),10,10,0);
 			batch.end();
-		}else{
+		}else if (Gdx.input.isKeyPressed(Input.Keys.UP)){
+			mario = new Animation<TextureRegion>(0.25f, walkFrame);
 			batch.begin();
-			mario = new Animation<TextureRegion>(0.23f,frames);
+			posy += 25;
+			batch.draw(walkCurrentFrame, posx, posy,0, 0,
+					walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),10,10,0);
+			batch.end();
+		}else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+			mario = new Animation<TextureRegion>(0.25f, leftWalkFrame);
+			batch.begin();
+			posy -= 25;
+			batch.draw(leftWalkCurrentFrame, posx, posy,0, 0,
+					leftWalkCurrentFrame.getRegionWidth(),leftWalkCurrentFrame.getRegionHeight(),10,10,0);
+			batch.end();
+		}else{
+			//Testing the idle animation (doesn't work)
+			batch.begin();
+			//mario = new Animation<TextureRegion>(0.25f,frames);
 			batch.draw(frame, posx, posy, 0, 0,
 					frame.getRegionWidth(),frame.getRegionHeight(),10,10,0);
 			batch.end();
 		}
+
+
 	}
 
 	@Override
