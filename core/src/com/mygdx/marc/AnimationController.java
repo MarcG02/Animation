@@ -1,4 +1,5 @@
 package com.mygdx.marc;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -11,6 +12,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.github.czyzby.websocket.WebSocket;
+import com.github.czyzby.websocket.WebSocketListener;
+import com.github.czyzby.websocket.WebSockets;
 
 public class AnimationController extends ApplicationAdapter {
 
@@ -27,9 +31,24 @@ public class AnimationController extends ApplicationAdapter {
 
 	Rectangle up, down, left, right, fire;
 	final int IDLE=0, UP=1, DOWN=2, LEFT=3, RIGHT=4;
+	float lastSend = 0f;
+
+	WebSocket socket;
+	String address = "localhost";
+	int port = 8888;
 
 	@Override
 	public void create() {
+
+		if( Gdx.app.getType()== Application.ApplicationType.Android )
+			// en Android el host és accessible per 10.0.2.2
+			address = "10.0.2.2";
+		socket = WebSockets.newSocket(WebSockets.toWebSocketUrl(address, port));
+		socket.setSendGracefully(false);
+		socket.addListener((WebSocketListener) new MyWSListener());
+		socket.connect();
+		socket.send("Enviar dades");
+
 		backGround = new Texture(Gdx.files.internal("backGround.png"));
 		walkSheet = new Texture(Gdx.files.internal("mario-Animation.png"));
 		posx = 750;
@@ -96,7 +115,7 @@ public class AnimationController extends ApplicationAdapter {
 				batch.begin();
 				mario = new Animation<TextureRegion>(0.55f,frames);
 				batch.draw(frame, posx, posy, 0, 0,
-						frame.getRegionWidth(),frame.getRegionHeight(),10,10,0);
+						frame.getRegionWidth(),frame.getRegionHeight(),5,5,0);
 				batch.end();
 				break;
 			case 1:
@@ -104,7 +123,7 @@ public class AnimationController extends ApplicationAdapter {
 				batch.begin();
 				posy += 25;
 				batch.draw(walkCurrentFrame, posx, posy,0, 0,
-						walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),10,10,0);
+						walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),5,5,0);
 				batch.end();
 				break;
 			case 2:
@@ -112,7 +131,7 @@ public class AnimationController extends ApplicationAdapter {
 				batch.begin();
 				posy -= 25;
 				batch.draw(walkCurrentFrame, posx, posy,0, 0,
-						walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),10,10,0);
+						walkCurrentFrame.getRegionWidth(),walkCurrentFrame.getRegionHeight(),5,5,0);
 				batch.end();
 				break;
 			case 3:
@@ -120,7 +139,7 @@ public class AnimationController extends ApplicationAdapter {
 				batch.begin();
 				posx -= 25;
 				batch.draw(leftWalkCurrentFrame, posx, posy,0, 0,
-						leftWalkCurrentFrame.getRegionWidth(),leftWalkCurrentFrame.getRegionHeight(),10,10,0);
+						leftWalkCurrentFrame.getRegionWidth(),leftWalkCurrentFrame.getRegionHeight(),5,5,0);
 				batch.end();
 				break;
 			case 4:
@@ -128,9 +147,14 @@ public class AnimationController extends ApplicationAdapter {
 				batch.begin();
 				posx += 25;
 				batch.draw(walkCurrentFrame, posx, posy, 0, 0,
-						walkCurrentFrame.getRegionWidth(), walkCurrentFrame.getRegionHeight(), 10, 10, 0);
+						walkCurrentFrame.getRegionWidth(), walkCurrentFrame.getRegionHeight(), 5, 5, 0);
 				batch.end();
 				break;
+		}
+
+		if( stateTime-lastSend > 1.0f ) {
+			lastSend = stateTime;
+			socket.send("El Personatge es mou");
 		}
 	}
 
@@ -168,5 +192,38 @@ public class AnimationController extends ApplicationAdapter {
 				}
 			}
 		return IDLE;
+	}
+
+	class MyWSListener implements WebSocketListener {
+
+		@Override
+		public boolean onOpen(WebSocket webSocket) {
+			System.out.println("Opening...");
+			return false;
+		}
+
+		@Override
+		public boolean onClose(WebSocket webSocket, int closeCode, String reason) {
+			System.out.println("Closing...");
+			return false;
+		}
+
+		@Override
+		public boolean onMessage(WebSocket webSocket, String packet) {
+			System.out.println("Message:");
+			return false;
+		}
+
+		@Override
+		public boolean onMessage(WebSocket webSocket, byte[] packet) {
+			System.out.println("Message:");
+			return false;
+		}
+
+		@Override
+		public boolean onError(WebSocket webSocket, Throwable error) {
+			System.out.println("ERROR:"+error.toString());
+			return false;
+		}
 	}
 }
